@@ -17,7 +17,7 @@ function getComputerChoice() {
  * @returns The player's option.
  */
 function getPlayerChoice() {
-    const playerSelection = prompt("Your turn");
+    const playerSelection = prompt("Your turn: rock, paper, scissors");
 
     // This check ensures that we have the required input before continuing any
     // further with execution.
