@@ -12,35 +12,14 @@ function getComputerChoice () {
 }
 
 /**
- * Receives the player's option.
- *
- * @returns The player's option.
- */
-function getPlayerChoice () {
-  const playerSelection = prompt('Your turn: rock, paper, scissors');
-
-  // This check ensures that we have the required input before continuing any
-  // further with execution.
-  if (
-    playerSelection === null ||
-    playerSelection.trim() === '' ||
-    !acceptedChoices.includes(playerSelection.toUpperCase())) {
-    console.error(
-      `Allowed options: ${acceptedChoices.join(', ')}. Try again!`
-    );
-    return null;
-  }
-
-  return playerSelection.trim().toUpperCase();
-}
-
-/**
  * Simulates a single round of the game.
  * @param {string} playerSelection The player's selection.
  * @param {string} computerSelection The computer's generated option.
  * @returns The player who wins the round. "computer", "player", or "tie".
  */
 function playRound (playerSelection, computerSelection) {
+  runningScore.innerHTML = `Round ${++round}`;
+
   if (computerSelection === playerSelection) { return 'tie'; }
 
   if (computerSelection === 'ROCK' && playerSelection === 'SCISSORS') {
@@ -63,52 +42,77 @@ function announceWinner (playerScore, computerScore) {
   if (playerScore === computerScore) { return "No one won. It's a tie"; }
 
   return (playerScore > computerScore)
-    ? 'You won the challenge'
-    : 'You lost the challenge';
+    ? 'You won the challenge :)'
+    : 'You lost the challenge :(';
 }
 
 /**
  * Simulates the rock, paper, scissors game.
  * @returns 0 on success, 1 otherwise.
  */
-function playGame () {
-  let playerScore = 0;
-  let computerScore = 0;
+function playGame (playerSelection) {
+  const computerSelection = getComputerChoice();
 
-  for (let i = 1; i <= 5; i++) {
-    const computerSelection = getComputerChoice();
-    const playerSelection = getPlayerChoice();
-
-    if (playerSelection === null) {
-      console.error("Invalid player option... Can't continue");
-      return 1;
-    }
-
-    const result = playRound(playerSelection, computerSelection);
-    if (result === 'computer') {
-      console.log(
-        `You Lose! ${computerSelection} beats ${playerSelection}`
-      );
-      computerScore++;
-    } else if (result === 'player') {
-      console.log(
-        `You Win! ${playerSelection} beats ${computerSelection}`
-      );
-      playerScore++;
-    } else {
-      console.log("It's a tie");
-    }
-
-    console.log(
-      `Round ${i} scores
-        Computer: ${computerScore}.
-        You: ${playerScore}.`
-    );
+  const result = playRound(playerSelection, computerSelection);
+  if (result === 'computer') {
+    para.innerText = `You Lose! ${computerSelection} beats ${playerSelection}`;
+    computerScore++;
+  } else if (result === 'player') {
+    para.innerText = `You Win! ${playerSelection} beats ${computerSelection}`;
+    playerScore++;
+  } else {
+    para.innerText = "It's a tie";
   }
 
-  console.log(announceWinner(playerScore, computerScore));
+  runningScore.innerText +=
+    `\nComputer: ${computerScore}.\nYou: ${playerScore}.`;
 
-  return 0;
+  if (playerScore === 5 || computerScore === 5) {
+    winner.innerText = announceWinner(playerScore, computerScore);
+
+    if (winner.innerText.includes('lost')) {
+      winner.classList.toggle('lost');
+    } else {
+      winner.classList.toggle('won');
+    }
+
+    results.append(winner);
+    para.remove();
+    runningScore.remove();
+    round = playerScore = computerScore = 0;
+  } else {
+    winner.remove();
+    results.append(runningScore, para);
+  }
 }
 
-playGame();
+//
+const buttons = document.querySelectorAll('button');
+
+buttons.forEach((button) => {
+  button.addEventListener('click', () => {
+    playGame(button.value.toUpperCase());
+  });
+});
+
+let playerScore = 0;
+let computerScore = 0;
+let round = 0;
+
+const container = document.querySelector('.container');
+
+// a div to hold the contents of the results while playing
+const results = document.createElement('div');
+results.classList = 'results center-text';
+results.innerText = 'Results';
+container.append(results);
+
+const para = document.createElement('p');
+para.setAttribute('class', 'center-text');
+para.id = 'outcome';
+
+const runningScore = document.createElement('p');
+runningScore.setAttribute('class', 'center-text score');
+
+const winner = document.createElement('p');
+winner.setAttribute('class', 'center-text winner');
