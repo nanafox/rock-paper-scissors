@@ -71,9 +71,9 @@ function playGame (playerSelection) {
     winner.innerText = announceWinner(playerScore, computerScore);
 
     if (winner.innerText.includes('lost')) {
-      winner.classList.toggle('lost');
+      winner.classList.add('lost');
     } else {
-      winner.classList.toggle('won');
+      winner.classList.add('won');
     }
 
     results.append(winner);
@@ -81,6 +81,7 @@ function playGame (playerSelection) {
     runningScore.remove();
     round = playerScore = computerScore = 0;
   } else {
+    winner.classList.remove('lost', 'won');
     winner.remove();
     results.append(runningScore, para);
   }
